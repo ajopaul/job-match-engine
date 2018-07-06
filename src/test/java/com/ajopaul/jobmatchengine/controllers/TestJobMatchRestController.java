@@ -13,8 +13,10 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.Charset;
 
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -56,13 +58,41 @@ public class TestJobMatchRestController {
     }
 
     @Test
-    public void testMinArray() throws Exception{
-        MvcResult result = mockMvc.perform(get("/jobmatch/" + 1))
+    public void testValidJob() throws Exception{
+        MvcResult result = mockMvc.perform(get("/jobmatch/" + 4))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.length()", lessThan(4)))
                 .andReturn()
                 ;
-                //.andExpect(jsonPath("$", hasSize(3)));
+
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testNoJobFound() throws Exception{
+        MvcResult result = mockMvc.perform(get("/jobmatch/" + 6))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.length()", is(0)))
+                .andReturn()
+                ;
+
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testTwoJobs() throws Exception{
+        MvcResult result = mockMvc.perform(get("/jobmatch/" + 14))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.length()", greaterThan(1)))
+                .andReturn()
+                ;
+
+
         System.out.println(result.getResponse().getContentAsString());
     }
 }

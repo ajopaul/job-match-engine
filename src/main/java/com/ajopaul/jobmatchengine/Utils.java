@@ -1,7 +1,7 @@
 package com.ajopaul.jobmatchengine;
 
 /**
- * Created by ajopaul on 5/7/18.
+ * Created from dZone
  */
 public class Utils {
 
@@ -17,23 +17,13 @@ public class Utils {
         }
         return (dist);
     }
-    /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
-/*::  This function converts decimal degrees to radians             :*/
-/*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
     private static double deg2rad(double deg) {
         return (deg * Math.PI / 180.0);
     }
-    /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
-/*::  This function converts radians to decimal degrees             :*/
-/*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
     private static double rad2deg(double rad) {
         return (rad * 180.0 / Math.PI);
-    }
-
-    public static void main(String[] args) {
-//        System.out.println(distance(32.9697, -96.80322, 29.46786, -98.53506, 'M') + " Miles\n");
-       // System.out.println(distance(-33.815348, 151.010236, -33.883014, 151.195933, 'K') + " Kilometers\n");
-//        System.out.println(distance(32.9697, -96.80322, 29.46786, -98.53506, 'N') + " Nautical Miles\n");
     }
 
 }

@@ -88,6 +88,19 @@ public class TestJobMatchRestController {
         MvcResult result = mockMvc.perform(get("/jobmatch/" + 14))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andReturn()
+                ;
+
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testJobs() throws Exception{
+        MvcResult result = mockMvc.perform(get("/jobmatch/" + 19))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.length()", greaterThan(1)))
                 .andReturn()
                 ;

@@ -156,10 +156,10 @@ public class TestJobMatchRestController {
     @Test
     public void testNoJobFound() {
         try {
-            mockMvc.perform(get("/jobmatch/" + 6))
+            mockMvc.perform(get("/jobmatch/" + 43))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
-//                    .andExpect(jsonPath("$", hasSize(0)))
+                    .andExpect(jsonPath("$", hasSize(0)))
                     .andDo(print())
                     ;
         } catch (Exception e) {
@@ -245,8 +245,18 @@ public class TestJobMatchRestController {
                     //.andDo(print())
                     ;
             String response = result.getResponse().getContentAsString();
-            Integer matchSize = JsonPath.read(response, "$.length()");
-            System.out.println("Worker Id "+ i+", match size "+matchSize);
+            Integer matchCount = 0;
+            String errorMessage = null;
+            try {
+                errorMessage = JsonPath.read(response, "$.message");
+            }catch (Exception e){
+                //do nothin.
+            }
+
+            if(null == errorMessage){
+                matchCount = JsonPath.read(response, "$.length()");
+            }
+            System.out.println("Worker Id "+ i+", match size "+matchCount + " errorMessage "+errorMessage);
         }
     }
 

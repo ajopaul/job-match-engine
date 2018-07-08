@@ -52,16 +52,19 @@ public class JobMatchEngineRestExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler({ Exception.class })
     public ResponseEntity<Object> handleAll( Exception e,  WebRequest request) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        String errMsg = e.getMessage();
         if(e instanceof JobMatchException){
             switch (((JobMatchException)e).code){
                 case REQUEST_ERROR:status = HttpStatus.BAD_REQUEST;
                                     break;
-                case DEP_ERROR: status = HttpStatus.SERVICE_UNAVAILABLE;
-                                break;
+                case DEP_ERROR:status = HttpStatus.SERVICE_UNAVAILABLE;
+                                    break;
+                case WORKER_INACTIVE: status = HttpStatus.OK;
+                                    break;
             }
         }
-        ErrorMessage errorMessage = new ErrorMessage(status, e.getMessage(), "error occurred");
-        return new ResponseEntity<Object>(errorMessage, new HttpHeaders(), errorMessage.getStatus());
+        ErrorMessage errorMessage = new ErrorMessage(status, errMsg, errMsg);
+        return new ResponseEntity<>(errorMessage, new HttpHeaders(), errorMessage.getStatus());
     }
 
 }

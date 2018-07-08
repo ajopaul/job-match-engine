@@ -6,14 +6,16 @@ package com.ajopaul.jobmatchengine.errorhandling;
 public class JobMatchException extends RuntimeException {
 
     public ERROR_CODE code;
-    public JobMatchException(ERROR_CODE code,String message){
+    public String secondaryMessage;
+    public JobMatchException(ERROR_CODE code,String message, String secondaryMessage){
         super(message);
         this.code = code;
+        this.secondaryMessage = secondaryMessage;
     }
 
     public enum ERROR_CODE{
         REQUEST_ERROR,
         DEP_ERROR,
-        USER_INACTIVE
+        WORKER_INACTIVE
     }
 }

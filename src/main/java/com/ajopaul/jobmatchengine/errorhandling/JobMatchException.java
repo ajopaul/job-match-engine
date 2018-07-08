@@ -14,5 +14,6 @@ public class JobMatchException extends RuntimeException {
     public enum ERROR_CODE{
         REQUEST_ERROR,
         DEP_ERROR,
+        USER_INACTIVE
     }
 }

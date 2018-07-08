@@ -13,7 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 /**
  * To catch the custom exceptions had throw appropriate return JSON
- * with correct error codes handled.
+ *
  */
 @ControllerAdvice
 public class JobMatchEngineRestExceptionHandler extends ResponseEntityExceptionHandler {

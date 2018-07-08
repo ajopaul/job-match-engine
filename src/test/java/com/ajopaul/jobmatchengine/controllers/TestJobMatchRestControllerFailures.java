@@ -10,7 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(SpringRunner.class)
 @WebMvcTest(JobMatchRestController.class)
 @TestPropertySource(locations="classpath:application-test.properties")
+//@Ignore
 public class TestJobMatchRestControllerFailures {
 
     @Autowired
@@ -42,7 +43,7 @@ public class TestJobMatchRestControllerFailures {
     @Test
     public void testWorkersListNotAvailable() {
         try {
-            mockMvc.perform(get("/api/jobmatch/1"))
+            mockMvc.perform(get("/jobmatch/1"))
                     .andExpect(status().isServiceUnavailable())
                     .andExpect(jsonPath("$.message", is("Unable to read data source of [Workers/Jobs]")))
                     .andDo(print())
@@ -56,7 +57,7 @@ public class TestJobMatchRestControllerFailures {
     @Test
     public void testJobsListNotAvailable() {
         try {
-            mockMvc.perform(get("/api/jobmatch/1"))
+            mockMvc.perform(get("/jobmatch/1"))
                     .andExpect(status().isServiceUnavailable())
                     .andExpect(jsonPath("$.message", is("Unable to read data source of [Workers/Jobs]")))
                     .andDo(print())

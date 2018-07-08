@@ -1,12 +1,14 @@
 package com.ajopaul.jobmatchengine.controllers;
 
 import com.ajopaul.jobmatchengine.Utils;
+import com.ajopaul.jobmatchengine.errorhandling.ErrorMessage;
 import com.ajopaul.jobmatchengine.errorhandling.JobMatchException;
 import com.ajopaul.jobmatchengine.model.Job;
 import com.ajopaul.jobmatchengine.model.Worker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
  */
 
 @RestController
-@RequestMapping("/api")
+//@RequestMapping("/api")
 public class JobMatchRestController {
 
     @Value("${workers.url}")
@@ -30,7 +32,7 @@ public class JobMatchRestController {
 
     @GetMapping(value = "/jobmatch/{workerId}",produces = "application/json")
     @ResponseBody
-    public List<Job> getJobMatch(@PathVariable(name = "workerId") Integer workerId) throws JobMatchException{
+    public ResponseEntity<?> getJobMatch(@PathVariable(name = "workerId") Integer workerId) throws JobMatchException{
 
         List<Worker> workerList = null;
         List<Job> jobList = null;
@@ -54,7 +56,10 @@ public class JobMatchRestController {
         }
 
         if(!worker.isIsActive()){
-            return Collections.EMPTY_LIST;
+            ErrorMessage message = new ErrorMessage(HttpStatus.OK,"Worker is not active","");
+            return ResponseEntity.ok().body(message);
+//            return message;
+//            return Collections.EMPTY_LIST;
         }
         //Get matched jobs and sort them in order of billed rate, but limit to max 3 jobs.
         List<Job> matchedJobs = jobList
@@ -64,7 +69,8 @@ public class JobMatchRestController {
                                 .limit(3)
                                 .collect(Collectors.toList());
 
-        return matchedJobs;
+        return ResponseEntity.ok().body(matchedJobs);
+//        return matchedJobs;
     }
 
     /*

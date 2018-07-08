@@ -1,19 +1,17 @@
 package com.ajopaul.jobmatchengine.controllers;
 
 import com.ajopaul.jobmatchengine.Utils;
+import com.ajopaul.jobmatchengine.errorhandling.JobMatchException;
 import com.ajopaul.jobmatchengine.model.Job;
 import com.ajopaul.jobmatchengine.model.Worker;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -21,31 +19,54 @@ import java.util.stream.Collectors;
  */
 
 @RestController
+@RequestMapping("/api")
 public class JobMatchRestController {
+
+    @Value("${workers.url}")
+    private String workersUrl;
+
+    @Value("${jobs.url}")
+    private String jobsUrl;
 
     @GetMapping(value = "/jobmatch/{workerId}",produces = "application/json")
     @ResponseBody
-    public List<Job> getJobMatch(@PathVariable(name = "workerId") String workerId) throws InstantiationException, IllegalAccessException {
+    public List<Job> getJobMatch(@PathVariable(name = "workerId") Integer workerId) throws JobMatchException{
 
+        List<Worker> workerList = null;
+        List<Job> jobList = null;
+        try {
+            workerList = getWorkersList(workersUrl);
+            jobList = getJobsList(jobsUrl);
+        }catch (Exception e){
+            throw new JobMatchException(JobMatchException.ERROR_CODE.DEP_ERROR
+                    ,"Unable to read data source of [Workers/Jobs]");
+        }
 
-        List<Worker> workerList = getWorkersList("http://test.swipejobs.com/api/workers");
+        Worker worker;
+        try {
+            worker = workerList
+                    .stream()
+                    .filter(w -> w.getUserId() == workerId)
+                    .findFirst()
+                    .get();
+        }catch(NoSuchElementException e){
+            throw new JobMatchException(JobMatchException.ERROR_CODE.REQUEST_ERROR,"Worker Id not found");
+        }
 
-        List<Job> jobList = getJobsList("http://test.swipejobs.com/api/jobs");
-
-        Worker worker = workerList
-                            .stream()
-                            .filter(w -> w.getUserId() == Integer.parseInt(workerId))
-                            .findFirst()
-                            .get();
-
+        if(!worker.isIsActive()){
+            return Collections.EMPTY_LIST;
+        }
+        //Get matched jobs and sort them in order of billed rate, but limit to max 3 jobs.
         List<Job> matchedJobs = jobList
                                 .stream()
                                 .filter(j -> isJobSuitable(worker, j))
+                                .sorted(Comparator.comparing(Job::getBillRateAmount).reversed())
                                 .limit(3)
                                 .collect(Collectors.toList());
 
         return matchedJobs;
     }
+
     /*
      Fetch the list of available jobs
      */
@@ -89,10 +110,9 @@ public class JobMatchRestController {
 
              isMatch = isMatch && worker.getCertificates().containsAll(j.getRequiredCertificates());
 
-             isMatch = isMatch && (int)Utils.distance(j.getLocation().getLatitude(),j.getLocation().getLongitude()
-                                            , worker.getJobSearchAddress().getLatitude(),worker.getJobSearchAddress().getLongitude()
-                                            ,worker.getJobSearchAddress().getUnit()) <= worker.getJobSearchAddress()
-                                            .getMaxJobDistance();
+             isMatch = isMatch && (int)Utils.manualDistance(worker.getJobSearchAddress().getLatitude()
+                                                ,worker.getJobSearchAddress().getLongitude(),j.getLocation().getLatitude()
+                                                ,j.getLocation().getLongitude()) <= worker.getJobSearchAddress().getMaxJobDistance();
         return isMatch;
     }
 }

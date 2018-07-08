@@ -1,9 +1,10 @@
 package com.ajopaul.jobmatchengine.model;
 
-import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -29,6 +30,7 @@ private List<String> requiredCertificates = null;
 private Location location;
 @JsonProperty("billRate")
 private String billRate;
+private double billRateAmount;
 @JsonProperty("workersRequired")
 private int workersRequired;
 @JsonProperty("startDate")
@@ -79,9 +81,12 @@ public String getBillRate() {
 return billRate;
 }
 
+
+
 @JsonProperty("billRate")
 public void setBillRate(String billRate) {
 this.billRate = billRate;
+    billRateAmount=Double.valueOf(billRate.replace("$",""));
 }
 
 @JsonProperty("workersRequired")
@@ -152,6 +157,10 @@ return jobId;
 @JsonProperty("jobId")
 public void setJobId(int jobId) {
 this.jobId = jobId;
+}
+
+public double getBillRateAmount() {
+        return billRateAmount;
 }
 
 }

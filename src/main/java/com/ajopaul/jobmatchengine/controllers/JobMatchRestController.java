@@ -1,11 +1,13 @@
 package com.ajopaul.jobmatchengine.controllers;
 
 import com.ajopaul.jobmatchengine.JobMatchEngine;
+import com.ajopaul.jobmatchengine.errorhandling.ErrorMessage;
 import com.ajopaul.jobmatchengine.errorhandling.JobMatchException;
 import com.ajopaul.jobmatchengine.model.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +40,10 @@ public class JobMatchRestController {
 
         List<Job> matchedJobs = jobMatchEngine.getJobMatches(workersUrl, jobsUrl, workerId);
 
-        return ResponseEntity.ok().body(matchedJobs);
+        return ResponseEntity.ok().body(matchedJobs.isEmpty() ? emptyJobsList(): matchedJobs);
+    }
+
+    private ErrorMessage emptyJobsList() {
+        return new ErrorMessage(HttpStatus.OK,"No Matching Jobs found.","");
     }
 }

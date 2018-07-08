@@ -159,7 +159,7 @@ public class TestJobMatchRestController {
             mockMvc.perform(get("/jobmatch/" + 43))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$", hasSize(0)))
+                    .andExpect(jsonPath("$.message", is("No Matching Jobs found.")))
                     .andDo(print())
                     ;
         } catch (Exception e) {
@@ -219,21 +219,6 @@ public class TestJobMatchRestController {
         }
     }
 
-    //@Test
-//    public void testWithGoogleMapsKey()  {
-//
-//        MvcResult result = mockMvc.perform(get("/jobmatch/" + 16 + "?key=AIzaSyDOE0kpj************"))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(contentType))
-//                .andExpect(jsonPath("$", hasSize(2)))
-//                .andReturn()
-//                ;
-//        System.out.println(result.getResponse().getContentAsString());
-//    }
-
-
-
-
 
 //    @Test
     public void printAllMatches() throws Exception {
@@ -259,5 +244,17 @@ public class TestJobMatchRestController {
             System.out.println("Worker Id "+ i+", match size "+matchCount + " errorMessage "+errorMessage);
         }
     }
+
+    /*@Test
+    public void testWithGoogleMapsKey()  {
+
+        MvcResult result = mockMvc.perform(get("/jobmatch/" + 16 + "?key=AIzaSyDOE0kpj************"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andReturn()
+                ;
+        System.out.println(result.getResponse().getContentAsString());
+    }*/
 
 }

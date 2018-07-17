@@ -11,7 +11,9 @@ Assumptions made:
   * If the Job has 'workersRequired' value of at least 1.
   * If the Worker matches with the Licence, Skills and Certificates requirements.
   * If the distance between the worker and job location is within worker's max distance.
-  * The final list is further limited to max 3 count ordered by highest bill rate first.
+  * The final list is further limited to max 3 count ordered by least distance and highest bill rate first.
   
 
 sample: http://13.238.92.18:8080/jobengine/jobmatch/8
+
+App Demo: http://jobengine.ajopaul.com

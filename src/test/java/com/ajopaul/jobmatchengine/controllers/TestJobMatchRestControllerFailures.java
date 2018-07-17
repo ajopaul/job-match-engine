@@ -45,7 +45,7 @@ public class TestJobMatchRestControllerFailures {
         try {
             mockMvc.perform(get("/jobmatch/1"))
                     .andExpect(status().isServiceUnavailable())
-                    .andExpect(jsonPath("$.message", is("Unable to read data source of [Workers/Jobs]")))
+                    .andExpect(jsonPath("$.errorMessage", is("Unable to read data source of [Workers/Jobs]")))
                     .andDo(print())
                     ;
             ;
@@ -59,7 +59,7 @@ public class TestJobMatchRestControllerFailures {
         try {
             mockMvc.perform(get("/jobmatch/1"))
                     .andExpect(status().isServiceUnavailable())
-                    .andExpect(jsonPath("$.message", is("Unable to read data source of [Workers/Jobs]")))
+                    .andExpect(jsonPath("$.errorMessage", is("Unable to read data source of [Workers/Jobs]")))
                     .andDo(print())
             ;
         } catch (Exception e) {

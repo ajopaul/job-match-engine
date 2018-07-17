@@ -13,6 +13,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+import static java.util.Collections.reverseOrder;
+import static java.util.Comparator.comparing;
+
 
 /**
  * Created by ajopaul on 6/7/18.
@@ -61,7 +64,8 @@ public class JobMatchEngine {
         return jobList
                 .stream()
                 .filter(j -> isJobSuitable(worker, j))
-                .sorted(Comparator.comparing(Job::getBillRateAmount).reversed())
+                .sorted(Comparator.comparing(Job::getDistanceToMe)
+                        .thenComparing(reverseOrder(comparing(Job::getBillRateAmount))))
                 .limit(3)
                 .collect(Collectors.toList());
     }
@@ -104,7 +108,14 @@ public class JobMatchEngine {
 
         isMatch = isMatch && checkCertificates(worker, job);
 
-        isMatch = isMatch && checkDistanceSuitable(worker, job);
+        int distance =(int) Utils.manualDistance(worker.getJobSearchAddress()
+                , job.getLocation()) ;
+
+        isMatch = isMatch &&  distance <= worker.getJobSearchAddress().getMaxJobDistance();
+
+        if(isMatch){
+            job.setDistanceToMe(distance);
+        }
 
         return isMatch;
     }

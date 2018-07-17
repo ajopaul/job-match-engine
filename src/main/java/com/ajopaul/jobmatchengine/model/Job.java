@@ -46,6 +46,16 @@ private String guid;
 @JsonProperty("jobId")
 private int jobId;
 
+    public double getDistanceToMe() {
+        return distanceToMe;
+    }
+
+    public void setDistanceToMe(double distanceToMe) {
+        this.distanceToMe = distanceToMe;
+    }
+
+    private double distanceToMe;
+
 @JsonProperty("driverLicenseRequired")
 public boolean isDriverLicenseRequired() {
 return driverLicenseRequired;

@@ -159,7 +159,7 @@ public class TestJobMatchRestController {
             mockMvc.perform(get("/jobmatch/" + 43))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$.message", is("No Matching Jobs found.")))
+                    .andExpect(jsonPath("$.errorMessage", is("No Matching Jobs found.")))
                     .andDo(print())
                     ;
         } catch (Exception e) {
@@ -173,7 +173,7 @@ public class TestJobMatchRestController {
             mockMvc.perform(get("/jobmatch/" + 30))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$", hasSize(3)))
+                    .andExpect(jsonPath("$.data", hasSize(3)))
                     .andDo(print())
                     ;
         } catch (Exception e) {
@@ -220,7 +220,7 @@ public class TestJobMatchRestController {
     }
 
 
-//    @Test
+    @Test
     public void printAllMatches() throws Exception {
         for(int i=1;i<=49;i++){
             MvcResult result = mockMvc.perform(get("/jobmatch/" + i))

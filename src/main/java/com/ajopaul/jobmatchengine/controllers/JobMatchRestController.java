@@ -6,6 +6,7 @@ import com.ajopaul.jobmatchengine.errorhandling.JobMatchException;
 import com.ajopaul.jobmatchengine.model.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by ajopaul on 5/7/18.
@@ -37,10 +39,13 @@ public class JobMatchRestController {
     @ResponseBody
     public ResponseEntity<?> getJobMatch(@PathVariable(name = "workerId") Integer workerId) throws JobMatchException{
 
-
-        List<Job> matchedJobs = jobMatchEngine.getJobMatches(workersUrl, jobsUrl, workerId);
-
-        return ResponseEntity.ok().body(null == matchedJobs || matchedJobs.isEmpty() ? new ResponseData(HttpStatus.OK,"No Matching Jobs found."): new ResponseData(matchedJobs));
+        return ResponseEntity
+            .ok()
+            .body(Optional
+                    .ofNullable(jobMatchEngine.getJobMatches(workersUrl, jobsUrl, workerId))
+                        .filter(l -> !CollectionUtils.isEmpty(l))
+                        .map(ResponseData::success)
+                        .orElse(ResponseData.error(HttpStatus.OK,"No Matching Jobs found.")));
     }
 
 }

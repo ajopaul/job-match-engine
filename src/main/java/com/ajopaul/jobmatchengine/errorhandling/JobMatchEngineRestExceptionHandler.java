@@ -2,6 +2,7 @@ package com.ajopaul.jobmatchengine.errorhandling;
 
 import com.ajopaul.jobmatchengine.ResponseData;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -12,6 +13,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.Optional;
+
 /**
  * To catch the custom exceptions had throw appropriate return JSON
  *
@@ -21,30 +24,34 @@ public class JobMatchEngineRestExceptionHandler extends ResponseEntityExceptionH
 
     @ExceptionHandler({ MethodArgumentTypeMismatchException.class })
     public ResponseEntity<?> handleMethodArgumentTypeMismatch( MethodArgumentTypeMismatchException e,  WebRequest request) {
-         String error = e.getName() + " should be of type " + e.getRequiredType().getSimpleName();
+         String error = e.getName() +
+                 " should be of type " +
+                 Optional.ofNullable(e.getRequiredType()).map(Class::getSimpleName).orElse("");
 
-        return new ResponseEntity<>(new ResponseData(HttpStatus.BAD_REQUEST,error)
+        return new ResponseEntity<>(ResponseData.error(HttpStatus.BAD_REQUEST,error)
                 , new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
 
     @Override
-    protected ResponseEntity<Object> handleNoHandlerFoundException( NoHandlerFoundException e,  HttpHeaders headers,  HttpStatus status,  WebRequest request) {
+    protected ResponseEntity<Object> handleNoHandlerFoundException( NoHandlerFoundException e,  HttpHeaders headers
+                                                            ,  HttpStatus status,  WebRequest request) {
         
          String error = "Invalid URL " + e.getHttpMethod() + " " + e.getRequestURL();
-        return new ResponseEntity<>(new ResponseData(HttpStatus.NOT_FOUND,error)
+        return new ResponseEntity<>(ResponseData.error(HttpStatus.NOT_FOUND,error)
                 , new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported( HttpRequestMethodNotSupportedException e,  HttpHeaders headers,  HttpStatus status,  WebRequest request) {
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported( HttpRequestMethodNotSupportedException e
+                                        ,  HttpHeaders headers,  HttpStatus status,  WebRequest request) {
         
         StringBuilder builder = new StringBuilder();
         builder.append(e.getMethod());
         builder.append(" method Not supported. Supported methods are ");
-        e.getSupportedHttpMethods().forEach(t -> builder.append(t + " "));
+        Optional.ofNullable(e.getSupportedHttpMethods()).map(t -> builder.append(t).append(" "));
 
-        return new ResponseEntity<>(new ResponseData(HttpStatus.METHOD_NOT_ALLOWED,builder.toString())
+        return new ResponseEntity<>(ResponseData.error(HttpStatus.METHOD_NOT_ALLOWED,builder.toString())
                 , new HttpHeaders(),HttpStatus.METHOD_NOT_ALLOWED);
     }
 
@@ -63,7 +70,7 @@ public class JobMatchEngineRestExceptionHandler extends ResponseEntityExceptionH
                                     break;
             }
         }
-        return new ResponseEntity<>(new ResponseData(status,errMsg), new HttpHeaders(), status);
+        return new ResponseEntity<>(ResponseData.error(status,errMsg), new HttpHeaders(), status);
     }
 
 }

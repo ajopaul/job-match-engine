@@ -11,13 +11,21 @@ public class ResponseData {
     public String errorMessage;
     public Object data;
 
-    public ResponseData(Object data) {
+    private ResponseData(Object data) {
         this.data = data;
         this.status = HttpStatus.OK;
     }
 
-    public ResponseData(HttpStatus status,String errorMessage){
+    private ResponseData(HttpStatus status,String errorMessage){
         this.status = status;
         this.errorMessage = errorMessage;
+    }
+
+    public static ResponseData success(Object data){
+        return new ResponseData(data);
+    }
+
+    public static ResponseData error(HttpStatus status, String errorMessage){
+        return new ResponseData(status, errorMessage);
     }
 }

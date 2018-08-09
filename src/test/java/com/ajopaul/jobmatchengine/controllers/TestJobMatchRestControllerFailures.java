@@ -27,8 +27,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 //@Ignore
 public class TestJobMatchRestControllerFailures {
 
-    @Autowired
-    private JobMatchRestController jobMatchRestController;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -36,7 +34,7 @@ public class TestJobMatchRestControllerFailures {
     private MockMvc mockMvc;
 
     @Before
-    public void setup() throws Exception {
+    public void setup()  {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 

@@ -11,8 +11,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+
 import static java.util.Collections.reverseOrder;
 import static java.util.Comparator.comparing;
 
@@ -60,7 +60,7 @@ public class JobMatchEngine {
         2. Sort the matched jobs based on the bill rate $ amount, Highest 1st.
         3. Limit the list to max 3
      */
-    private List<Job> filteredJobs(Worker worker, List<Job> jobList) {
+    private List<Job> filteredJobs(final Worker worker, final List<Job> jobList) {
         return jobList
                 .stream()
                 .filter(j -> isJobSuitable(worker, j))
@@ -74,17 +74,12 @@ public class JobMatchEngine {
         Get the worker based on worker id from workersList
         IF worker is Inactive, return with message Worker not active
      */
-    private Worker getWorker(Integer workerId, List<Worker> workerList) {
-        Worker worker;
-        try {
-            worker = workerList
+    private Worker getWorker(final Integer workerId, final List<Worker> workerList) {
+        Worker worker = workerList
                     .stream()
                     .filter(w -> w.getUserId() == workerId)
                     .findFirst()
-                    .get();
-        }catch(NoSuchElementException e){
-            throw new JobMatchException(JobMatchException.ERROR_CODE.REQUEST_ERROR,"Worker Id not found","");
-        }
+                    .orElseThrow(() -> new JobMatchException(JobMatchException.ERROR_CODE.REQUEST_ERROR,"Worker Id not found",""));
 
         if(!worker.isIsActive()){
             throw new JobMatchException(JobMatchException.ERROR_CODE.WORKER_INACTIVE,"Worker not active","");
@@ -99,7 +94,7 @@ public class JobMatchEngine {
      * @param job
      * @return
      */
-    private boolean isJobSuitable(Worker worker, Job job){
+    private boolean isJobSuitable(final Worker worker, final Job job){
         boolean isMatch = checkWorkersRequired(job);
 
         isMatch = isMatch && checkDriversLicense(worker, job);
@@ -123,45 +118,35 @@ public class JobMatchEngine {
     /*
    Check if the job needs workers at the moment i.e >= 1
     */
-    private boolean checkWorkersRequired(Job job) {
+    private boolean checkWorkersRequired(final Job job) {
         return job.getWorkersRequired() >= 1;
     }
 
     /*
     Check if the worker meets the driving licence requirement
      */
-    private boolean checkDriversLicense(Worker worker, Job job) {
+    private boolean checkDriversLicense(final Worker worker, final Job job) {
         return !job.isDriverLicenseRequired() || worker.isHasDriversLicense();
     }
 
     /*
      Check if the worker has all the skill needed in the job desc
       */
-    private boolean checkSkills(Worker worker, Job job) {
+    private boolean checkSkills(final Worker worker, final Job job) {
         return  worker.getSkills().contains(job.getJobTitle());
     }
 
     /*
    Check if the worker has all the certificates required in the job desc
     */
-    private boolean checkCertificates(Worker worker, Job job) {
+    private boolean checkCertificates(final Worker worker, final Job job) {
         return worker.getCertificates().containsAll(job.getRequiredCertificates());
-    }
-
-    /*
-    Check if the distance to be travelled is within workers' max dist
-     */
-    private boolean checkDistanceSuitable(Worker worker, Job job) {
-        int distance =(int) Utils.manualDistance(worker.getJobSearchAddress()
-                        , job.getLocation()) ;
-
-        return distance <= worker.getJobSearchAddress().getMaxJobDistance();
     }
 
     /*
      Fetch the list of available jobs
      */
-    private List<Job> getJobsList(String url) {
+    private List<Job> getJobsList(final String url) {
         RestTemplate rest = new RestTemplate();
         List<Job> jobList;
         ResponseEntity<List<Job>> jobResponse =
@@ -175,7 +160,7 @@ public class JobMatchEngine {
     /*
     Get the list of workers
      */
-    private List<Worker> getWorkersList(String url) {
+    private List<Worker> getWorkersList(final String url) {
         RestTemplate rest = new RestTemplate();
         List<Worker> workerList;
         ResponseEntity<List<Worker>> workResponse =
